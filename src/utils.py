@@ -16,7 +16,7 @@ def get_new_length(image):
     return new_length
 
 
-def enlarge_image(image, new_length=-1):
+def enlarge_image(image):
     """Enlarge an image, allowing it to be rotated without losing data"""
     return enlarge_images(tf.expand_dims(image, 0))[0]
 
@@ -24,18 +24,18 @@ def enlarge_image(image, new_length=-1):
 def enlarge_images(images):
     # First we find the "square" part of the tensor
     start = -1
-    for i in range(len(images.shape)-1):
+    for i in range(len(images.shape) - 1):
         if images.shape[i] == 1:
             continue
-        if images.shape[i] == images.shape[i+1]:
+        if images.shape[i] == images.shape[i + 1]:
             start = i
     new_length = math.ceil(math.sqrt(2) * images.shape[start])
     offset = int((new_length - images.shape[start]) / 2)
     padding = tf.constant(
-            [[0,0]] * (start)
-            + [[offset, offset], [offset, offset]]
-            + [[0,0]] * (len(images.shape)-start-2)
-            )
+        [[0, 0]] * (start)
+        + [[offset, offset], [offset, offset]]
+        + [[0, 0]] * (len(images.shape) - start - 2)
+    )
     return tf.pad(images, padding)
 
 
@@ -46,7 +46,7 @@ def random_rotation_angle(step):
 
 def rotate_image(image, angle):
     """perform a rotation on a numpy image array"""
-    if type(image) != np.ndarray:
+    if not isinstance(image, np.ndarray):
         image = image.numpy()
     img = Image.fromarray(image)
     img = img.rotate(angle)
@@ -69,7 +69,8 @@ def random_rotate_image(image, step):
 def random_rotate_images(images, step):
     """rotates each image somewhere between 0 and 360 degrees, with step"""
     to_look = images
-    rotations = [math.radians(randint(0, 360/step) * step) for i in range(len(to_look))]
+    rotations = [math.radians(randint(0, 360 / step) * step)
+                 for i in range(len(to_look))]
     return tfa.image.rotate(images, rotations)
 
 
@@ -80,12 +81,12 @@ def combine_patches(patches):
     shape = 1
     for i in patches.shape:
         shape *= i
-    l1 = int(math.sqrt(shape))
-    l2 = int(shape / l1)
-    while l1 * l2 != shape and l1 > 0:
-        l1 -= 1
-        l2 = int(shape / l1)
-    return np.reshape(patches, (l1, l2), 'F')
+    a = int(math.sqrt(shape))
+    b = int(shape / a)
+    while a * b != shape and a > 0:
+        a -= 1
+        b = int(shape / a)
+    return np.reshape(patches, (a, b), 'F')
 
 
 def combine_save_patches(patches, indx, name=''):

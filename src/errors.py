@@ -17,5 +17,5 @@ def all_squared_errors(one, rest):
     if len(one.shape) == 2:
         one = tf.expand_dims(one, 0)
     return tf.reduce_sum(
-            tf.reduce_sum(
-                tf.math.squared_difference(one, rest), 1), 1)
+        tf.reduce_sum(
+            tf.math.squared_difference(one, rest), 1), 1)

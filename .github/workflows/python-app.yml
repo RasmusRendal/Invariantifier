@@ -29,7 +29,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --ignore=E402 --max-line-length=127 --statistics
     - name: Lint with Pylint
       run: |
-        pylint ../P5-hack
+        pylint ../Invariantifier
     - name: Test with pytest
       run: |
         python -m unittest

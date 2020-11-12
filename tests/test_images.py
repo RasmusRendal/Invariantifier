@@ -1,10 +1,9 @@
+import unittest
+from utils import rotate_image, rotate_images, enlarge_image
+import numpy as np
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
-
-import numpy as np
-from utils import rotate_image, rotate_images, enlarge_image
-import unittest
 
 
 class TestRotations(unittest.TestCase):
