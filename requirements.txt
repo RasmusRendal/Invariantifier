@@ -1,0 +1,7 @@
+tensorflow==2.2.0
+tensorflow-gpu==2.2.0
+tensorflow-addons==0.11.2
+opencv-python
+matplotlib
+numpy
+tqdm
