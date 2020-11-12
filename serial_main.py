@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 
-from training_sample_finder import get_training_samples
-from runner import check_some
-from options import Options
-from network import train_network, get_dataset, get_model, split_network
-from time import perf_counter
-from tqdm.auto import tqdm
 import argparse
 import cProfile
 import os
 import shutil
 import sys
+from time import perf_counter
+
+from tqdm.auto import tqdm
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+from training_sample_finder import get_training_samples
+from runner import check_some
+from options import Options
+from network import train_network, get_dataset, get_model, split_network
 
 
 def run_experiment(
@@ -48,12 +49,10 @@ def run_experiment(
 def setup():
     options = Options()
     options.serial = True
-    x_train, y_train, x_test, y_test = get_dataset(
-        options)  # pylint: disable=unused-variable
+    x_train, y_train, x_test, y_test = get_dataset(options)  # pylint: disable=unused-variable
 
     model = train_network(get_model(x_test), options)
-    only_convolutional = split_network(
-        model, options.convlayers)  # pylint: disable=unused-variable
+    only_convolutional = split_network(model, options.convlayers)  # pylint: disable=unused-variable
 
     profiling_dir = 'profiling'
     experiment_dir = 'experiments'

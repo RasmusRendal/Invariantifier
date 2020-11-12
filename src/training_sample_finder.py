@@ -18,8 +18,8 @@ def get_all_distances(cached, current_set, rest):
     return distances
 
 
-def sum_get_all_distances(get_all_distances):
-    return tf.reduce_min(get_all_distances, 0)
+def sum_all_distances(all_distances):
+    return tf.reduce_min(all_distances, 0)
 
 
 def get_representative_patches(x_train, examples, options):
@@ -28,7 +28,7 @@ def get_representative_patches(x_train, examples, options):
     added_indexes = []
     for _ in tqdm(range(1, examples), disable=options.serial):
         distances = get_all_distances(distances, currentset, x_train)
-        sum_distances = sum_get_all_distances(distances)
+        sum_distances = sum_all_distances(distances)
         maxindex = int(tf.argmax(sum_distances).numpy())
         assert maxindex not in added_indexes
         added_indexes.append(maxindex)

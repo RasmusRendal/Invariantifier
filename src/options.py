@@ -1,7 +1,7 @@
 """File which contains the options for the program"""
-from caching import Cache
 import argparse
 import sys
+from caching import Cache
 
 
 class Options:

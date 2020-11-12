@@ -1,7 +1,6 @@
 """The main algorithm is in this file. The entrypoint will be
 get_proper_rotation"""
 import math
-import math
 import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
@@ -62,7 +61,6 @@ def get_proper_rotation(
     return get_best_rotation(
         training_samples,
         rotations,
-        rotations_to_try,
         options)
 
 
@@ -92,7 +90,7 @@ def get_rotations(image, options):
     return rotations
 
 
-def get_best_rotation(training_samples, rotations, rotations_to_try, options):
+def get_best_rotation(training_samples, rotations, options):
     """This function is a bit of a complicated matrix operation.
     Given a tensor training_samples of dimension m * i, and tensor
     rotations n * i, where m and n are scalars, and i are any subsequent

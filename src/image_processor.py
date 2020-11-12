@@ -1,6 +1,5 @@
 import tensorflow as tf
-from network import image_to_model
-from utils import enlarge_image, enlarge_images, combine_patches
+from utils import enlarge_images
 
 
 def process_image(image, only_convolutional, options):
