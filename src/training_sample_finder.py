@@ -1,13 +1,15 @@
-from utils import enlarge_images, combine_patches, combine_save_patches
-from errors import all_squared_errors
-import tensorflow as tf
+from random import randint
 from tqdm.auto import tqdm
 import numpy as np
-from random import randint
-from image_processor import process_images
+import tensorflow as tf
 
 
-def all_distances(cached, current_set, rest):
+from src.image_processor import process_images
+from src.errors import all_squared_errors
+from src.utils import combine_save_patches
+
+
+def get_all_distances(cached, current_set, rest):
     distances = cached
     for i in range(len(cached), len(current_set)):
         # This produces a 60k length array, of the distance for
@@ -25,22 +27,21 @@ def get_representative_patches(x_train, examples, options):
     distances = []
     added_indexes = []
     for _ in tqdm(range(1, examples), disable=options.serial):
-        distances = all_distances(distances, currentset, x_train)
+        distances = get_all_distances(distances, currentset, x_train)
         sum_distances = sum_all_distances(distances)
         maxindex = int(tf.argmax(sum_distances).numpy())
-        assert(maxindex not in added_indexes)
+        assert maxindex not in added_indexes
         added_indexes.append(maxindex)
         currentset.append(x_train[maxindex])
     return currentset
 
 
 def get_random_training_samples(x_train, options):
-    indexes = [randint(0, len(x_train)-1) for i in range(options.examples)]
+    indexes = [randint(0, len(x_train) - 1) for i in range(options.examples)]
     # Hack for indexing with an array
     if isinstance(x_train, np.ndarray):
         return x_train[indexes]
-    else:
-        return x_train.numpy()[indexes]
+    return x_train.numpy()[indexes]
 
 
 def get_seperated_representatives(x_train, y_train, options):
@@ -51,20 +52,26 @@ def get_seperated_representatives(x_train, y_train, options):
         x_train = x_train.numpy()
     for i in range(10):
         idx = tf.squeeze(tf.where(y_train == i))
-        training_samples.append(get_representative_patches(x_train[idx], int(options.examples / 10), options))
+        training_samples.append(
+            get_representative_patches(
+                x_train[idx], int(
+                    options.examples / 10), options))
     return tf.concat(training_samples, 0)
 
 
 def get_training_samples(only_convolutional, x_train, y_train, options):
     training_samples = None
     if options.representatives:
-        training_samples = get_seperated_representatives(x_train, y_train, options)
+        training_samples = get_seperated_representatives(
+            x_train, y_train, options)
     else:
         training_samples = get_random_training_samples(x_train, options)
     if len(training_samples.shape) != 3:
-        raise ValueError("Invalid shape returned by patch finder: " + str(training_samples.shape))
+        raise ValueError(
+            "Invalid shape returned by patch finder: " + str(training_samples.shape))
 
-    training_samples = process_images(training_samples, only_convolutional, options)
+    training_samples = process_images(
+        training_samples, only_convolutional, options)
 
     if options.debug:
         for index, item in enumerate(training_samples):

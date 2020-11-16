@@ -2,8 +2,8 @@
 """module for various NN-related models and utilities"""
 import tensorflow as tf
 import numpy as np
-from trainer import train_and_test
-from utils import enlarge_images
+from src.trainer import train_and_test
+from src.utils import enlarge_images
 
 
 def split_network(model, num_layers):
@@ -14,8 +14,10 @@ def split_network(model, num_layers):
         if isinstance(layer, tf.keras.layers.Conv2D):
             num_layers -= 1
             if num_layers == 0:
-                return tf.keras.Model(inputs=model.inputs, outputs=layer.output)
+                return tf.keras.Model(
+                    inputs=model.inputs, outputs=layer.output)
     raise ValueError("There are not that many layers")
+
 
 def get_dataset(options):
     """Gets the MNIST dataset, and enlarge the images if options.enlarge is set to true"""
@@ -35,12 +37,12 @@ def get_model(x_test):
 
     model = tf.keras.Sequential([
         tf.keras.Input(shape=input_shape),
-        tf.keras.layers.Conv2D(64, kernel_size=(3,3), activation="relu", input_shape=input_shape),
-        tf.keras.layers.MaxPooling2D(pool_size=(2,2), strides=(1,1)),
+        tf.keras.layers.Conv2D(64, kernel_size=(3, 3), activation="relu", input_shape=input_shape),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2), strides=(1, 1)),
         tf.keras.layers.Conv2D(64, kernel_size=(3), activation="relu"),
-        tf.keras.layers.MaxPooling2D(pool_size=(2,2), strides=(1,1)),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2), strides=(1, 1)),
         tf.keras.layers.Conv2D(64, kernel_size=(5), strides=2, padding='same', activation="relu"),
-        tf.keras.layers.MaxPooling2D(pool_size=(2,2), strides=(1,1)),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2), strides=(1, 1)),
         tf.keras.layers.Dropout(0.4),
 
         tf.keras.layers.Conv2D(64, kernel_size=(3), activation="relu", input_shape=input_shape),

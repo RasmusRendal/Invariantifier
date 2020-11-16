@@ -1,10 +1,9 @@
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
-import errors
 import unittest
-import numpy as np
+
 import tensorflow as tf
+import numpy as np
+
+import src.errors as errors
 
 
 class ErrorsTesting(unittest.TestCase):
@@ -22,7 +21,8 @@ class ErrorsTesting(unittest.TestCase):
         firstImage[0][1] = 1
         secondImage[0][0] = 1
         thirdImage = np.zeros(dims)
-        second = tf.constant([secondImage, thirdImage, secondImage], dtype=np.float32)
+        second = tf.constant(
+            [secondImage, thirdImage, secondImage], dtype=np.float32)
         firstTF = tf.constant(firstImage, dtype=np.float32)
         for _ in range(10):
             all_error = errors.all_squared_errors(firstTF, second)
@@ -32,7 +32,5 @@ class ErrorsTesting(unittest.TestCase):
             self.assertEqual(1, all_error[2])
 
 
-
 if __name__ == '__main__':
     unittest.main()
-

@@ -5,6 +5,7 @@ import os
 
 class Cache:
     """class for unified caching of objects in pickled form"""
+
     def __init__(self, cache_dir):
         self.cache_dir = cache_dir
         if not os.path.exists(self.cache_dir):
@@ -29,4 +30,5 @@ class Cache:
 
     def exists_in_cache(self, namespace, identifier):
         """check whether a given namespace-identifier combo exists in the cache"""
-        return os.path.exists(f"{self.cache_dir}{namespace}_{identifier}.pickle")
+        return os.path.exists(
+            f"{self.cache_dir}{namespace}_{identifier}.pickle")

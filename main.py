@@ -3,12 +3,12 @@
     run the script by './main.py' or 'python3 main.py'"""
 import sys
 import os
+from src.runner import check_some
+from src.options import Options
+from src.training_sample_finder import get_training_samples
+from src.network import train_network, get_dataset, get_model, split_network
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
-from network import train_network, get_dataset, get_model, split_network
-from training_sample_finder import get_training_samples
-from options import Options
-from runner import checkSome
 
 if __name__ == "__main__":
     # Initialize the options class.
@@ -21,7 +21,15 @@ if __name__ == "__main__":
     # network, if there doesn't exist a saved network
     model = train_network(get_model(x_test), options)
     only_convolutional = split_network(model, options.convlayers)
-    training_samples = get_training_samples(only_convolutional, x_train, y_train, options)
+    training_samples = get_training_samples(
+        only_convolutional, x_train, y_train, options)
 
-    # Run the checksome function, which tests a chosen algorithm to find if it can properly rotate pictures back
-    checkSome(only_convolutional, x_test, y_test, model, training_samples, options)
+    # Run the checksome function, which tests a chosen algorithm to find if it
+    # can properly rotate pictures back
+    check_some(
+        only_convolutional,
+        x_test,
+        y_test,
+        model,
+        training_samples,
+        options)

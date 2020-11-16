@@ -2,11 +2,11 @@
 get_proper_rotation"""
 import math
 import numpy as np
-from utils import combine_save_patches, rotate_images
-from image_processor import process_image
-import math
 import tensorflow as tf
 import tensorflow_addons as tfa
+
+from src.image_processor import process_image
+from src.utils import combine_save_patches, rotate_images
 
 
 def np_array_len(array):
@@ -29,23 +29,37 @@ def cmp_np_arrays(arr1, arr2):
     return True
 
 
-def get_proper_rotation(only_convolutional, image, training_samples, imgindx, options):
+def get_proper_rotation(only_convolutional,
+                        image,
+                        training_samples,
+                        imgindx,
+                        options):
     """Get the rotation to apply to a network to make it recognizable"""
-    rotations_to_try = int(360 / options.step)
     image = process_image(image, only_convolutional, options)
     rotations = get_rotations(image, options)
 
     if options.debug:
-        for i in range(len(rotations)):
-            combine_save_patches(rotations[i], imgindx, 'ConvRots_img_' + str(i))
-        for i in range(len(rotations)):
-            for j in range(i + 1, len(rotations)):
-                same = cmp_np_arrays(rotations[i], rotations[j])
-                if same:
-                    print("Index " + str(i) + " and index " + str(j) + " are identical")
+        for index, rotation in enumerate(rotations):
+            combine_save_patches(
+                rotation,
+                imgindx,
+                'ConvRots_img_' +
+                str(index))
+        for (index1, rotation1), (index2, rotation2) in zip(
+                enumerate(rotations), enumerate(rotations)):
+            same = cmp_np_arrays(rotation1, rotation2)
+            if same:
+                print(
+                    "Index " +
+                    str(index1) +
+                    " and index " +
+                    str(index2) +
+                    " are identical")
 
-
-    return get_best_rotation(training_samples, rotations, rotations_to_try, options)
+    return get_best_rotation(
+        training_samples,
+        rotations,
+        options)
 
 
 def get_rotations(image, options):
@@ -53,15 +67,19 @@ def get_rotations(image, options):
     rotations = None
     if options.combine:
         rotations_to_try = int(360 / options.step)
-        rotations = tf.tile(tf.expand_dims(tf.expand_dims(image, -1), 0), [rotations_to_try, 1, 1, 1])
-        rotations = tfa.image.rotate(rotations, [i * math.pi / 180 for i in range(0, 360, options.step)])
+        rotations = tf.tile(tf.expand_dims(tf.expand_dims(
+            image, -1), 0), [rotations_to_try, 1, 1, 1])
+        rotations = tfa.image.rotate(
+            rotations, [i * math.pi / 180 for i in range(0, 360, options.step)])
         rotations = tf.squeeze(rotations)
     else:
         if options.convlayers == 0:
             rotations = [rotate_images(image.numpy(), i)
                          for i in range(0, 360, options.step)]
         else:
-            rotation_angles = [math.radians(i) for i in range(0, 360, options.step)]
+            rotation_angles = [
+                math.radians(i) for i in range(
+                    0, 360, options.step)]
             rotated = []
             for angle in rotation_angles:
                 rotated.append(tfa.image.rotate(image, angle))
@@ -70,7 +88,7 @@ def get_rotations(image, options):
     return rotations
 
 
-def get_best_rotation(training_samples, rotations, rotations_to_try, options):
+def get_best_rotation(training_samples, rotations, options):
     """This function is a bit of a complicated matrix operation.
     Given a tensor training_samples of dimension m * i, and tensor
     rotations n * i, where m and n are scalars, and i are any subsequent
@@ -89,7 +107,7 @@ def get_best_rotation(training_samples, rotations, rotations_to_try, options):
     error = tf.math.squared_difference(rotations, training_samples)
 
     # Reduce all axes, besides the two first, by summing
-    reduce_axes = [i for i in range(2, len(error.shape))]
+    reduce_axes = list(range(2, len(error.shape)))
     error = tf.reduce_sum(error, axis=reduce_axes)
 
     # We don't care which training_sample matches the best, so take the min

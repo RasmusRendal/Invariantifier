@@ -1,8 +1,7 @@
+import unittest
+import src.utils as utils
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
-import utils
-import unittest
 
 
 class UtilsTester(unittest.TestCase):
