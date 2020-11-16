@@ -1,5 +1,5 @@
 import tensorflow as tf
-from utils import enlarge_images
+from src.utils import enlarge_images
 
 
 def process_image(image, only_convolutional, options):

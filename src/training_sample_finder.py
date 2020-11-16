@@ -4,9 +4,9 @@ import numpy as np
 import tensorflow as tf
 
 
-from image_processor import process_images
-from errors import all_squared_errors
-from utils import combine_save_patches
+from src.image_processor import process_images
+from src.errors import all_squared_errors
+from src.utils import combine_save_patches
 
 
 def get_all_distances(cached, current_set, rest):

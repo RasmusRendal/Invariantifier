@@ -1,10 +1,10 @@
 """File which contains the options for the program"""
 import argparse
 import sys
-from caching import Cache
+from src.caching import Cache
 
 
-class Options:
+class Options: # pylint: disable=too-many-instance-attributes
     """options class for storing various options for running the script"""
 
     def post_init(self):

@@ -5,8 +5,8 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
 
-from image_processor import process_image
-from utils import combine_save_patches, rotate_images
+from src.image_processor import process_image
+from src.utils import combine_save_patches, rotate_images
 
 
 def np_array_len(array):
@@ -29,14 +29,12 @@ def cmp_np_arrays(arr1, arr2):
     return True
 
 
-def get_proper_rotation(
-        only_convolutional,
-        image,
-        training_samples,
-        imgindx,
-        options):
+def get_proper_rotation(only_convolutional,
+                        image,
+                        training_samples,
+                        imgindx,
+                        options):
     """Get the rotation to apply to a network to make it recognizable"""
-    rotations_to_try = int(360 / options.step)
     image = process_image(image, only_convolutional, options)
     rotations = get_rotations(image, options)
 

@@ -2,8 +2,8 @@
 """module for various NN-related models and utilities"""
 import tensorflow as tf
 import numpy as np
-from trainer import train_and_test
-from utils import enlarge_images
+from src.trainer import train_and_test
+from src.utils import enlarge_images
 
 
 def split_network(model, num_layers):

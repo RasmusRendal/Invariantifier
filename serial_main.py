@@ -4,28 +4,26 @@ import argparse
 import cProfile
 import os
 import shutil
-import sys
+
 from time import perf_counter
 
 from tqdm.auto import tqdm
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
-from training_sample_finder import get_training_samples
-from runner import check_some
-from options import Options
-from network import train_network, get_dataset, get_model, split_network
+from src.training_sample_finder import get_training_samples
+from src.runner import check_some
+from src.options import Options
+from src.network import train_network, get_dataset, get_model, split_network
 
-
-def run_experiment(
-        iterations,
-        options,
-        x_train,
-        y_train,
-        x_test,
-        y_test,
-        model,
-        only_convolutional,
-        filename):
+# pylint: disable=too-many-arguments
+def run_experiment(iterations,
+                   options,
+                   x_train,
+                   y_train,
+                   x_test,
+                   y_test,
+                   model,
+                   only_convolutional,
+                   filename):
     with open(filename, 'w') as f:
         f.write("examples,time,accuracy\n")
         for i in tqdm(range(10, iterations), desc=filename):
@@ -87,7 +85,6 @@ def setup():
 
     args = parser.parse_args()
 
-    # TODO: Make this cleaner
     try:
         shutil.rmtree(experiment_dir)
     except OSError:

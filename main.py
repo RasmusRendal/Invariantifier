@@ -3,10 +3,10 @@
     run the script by './main.py' or 'python3 main.py'"""
 import sys
 import os
-from runner import check_some
-from options import Options
-from training_sample_finder import get_training_samples
-from network import train_network, get_dataset, get_model, split_network
+from src.runner import check_some
+from src.options import Options
+from src.training_sample_finder import get_training_samples
+from src.network import train_network, get_dataset, get_model, split_network
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 

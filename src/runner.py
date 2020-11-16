@@ -1,10 +1,10 @@
 from tqdm.auto import tqdm
 
 import numpy as np
-from rotation_finder import get_proper_rotation
-from utils import rotate_image, combine_save_patches, random_rotation_angle
+from src.rotation_finder import get_proper_rotation
+from src.utils import rotate_image, combine_save_patches, random_rotation_angle
 
-
+#pylint: disable=too-many-arguments,too-many-locals
 def check_some(only_convolutional, x_test, y_test, model, examples, options):
     to_test = []
     rotation_error = 0.0

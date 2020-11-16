@@ -1,7 +1,7 @@
 import os.path
 import numpy as np
 import tensorflow as tf
-from utils import enlarge_images, random_rotate_images
+from src.utils import enlarge_images, random_rotate_images
 
 # try:
 #     tf.compat.v1.enable_eager_execution()

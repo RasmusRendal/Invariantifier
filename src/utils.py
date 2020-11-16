@@ -36,7 +36,7 @@ def enlarge_images(images):
         + [[offset, offset], [offset, offset]]
         + [[0, 0]] * (len(images.shape) - start - 2)
     )
-    return tf.pad(images, padding)
+    return tf.pad(images, padding, constant_values=0)
 
 
 def random_rotation_angle(step):
