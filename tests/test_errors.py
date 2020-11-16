@@ -1,10 +1,9 @@
+import unittest
+
 import tensorflow as tf
 import numpy as np
-import unittest
-import errors
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
+
+import src.errors as errors
 
 
 class ErrorsTesting(unittest.TestCase):

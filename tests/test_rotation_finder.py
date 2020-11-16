@@ -1,9 +1,10 @@
-import numpy as np
-import rotation_finder
 import unittest
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
+
+import numpy as np
+
+import src.rotation_finder as rotation_finder
 
 
 class RotationFinderTester(unittest.TestCase):
