@@ -20,7 +20,7 @@ if __name__ == "__main__":
     # Gets the model and the conv part of model, the function also trains the
     # network, if there doesn't exist a saved network
     model = train_network(get_model(x_test), options)
-    only_convolutional = split_network(model, options.convlayers)
+    only_convolutional, _ = split_network(model, options.convlayers)
     training_samples = get_training_samples(
         only_convolutional, x_train, y_train, options)
 

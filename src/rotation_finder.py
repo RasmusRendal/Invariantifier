@@ -96,6 +96,8 @@ def get_best_rotation(training_samples, rotations, options):
     between m and n. It will then find the index i,j with the lowest error,
     returning j (The rotation)
     """
+    if rotations.shape[1:] != training_samples.shape[1:]:
+        raise ValueError("Incompatible shapes: {0} and {1}".format(rotations.shape, training_samples.shape))
 
     # Expand the dimensions of the vectors to be (1, n) + i
     # and (n, 1) + 1. This makes the arrays compatible using
