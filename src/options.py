@@ -24,6 +24,7 @@ class Options: # pylint: disable=too-many-instance-attributes
         self.serial = False
         self.representatives = False
         self.samples = 100
+        self.rotate_first = False
 
     def parse_args(self, xtest_len):
         parser = argparse.ArgumentParser(description='Identify some numbers')

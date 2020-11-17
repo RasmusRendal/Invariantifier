@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
 
-from src.image_processor import process_image
+from src.image_processor import process_image, process_images
 from src.utils import combine_save_patches, rotate_images
 
 
@@ -35,8 +35,13 @@ def get_proper_rotation(only_convolutional,
                         imgindx,
                         options):
     """Get the rotation to apply to a network to make it recognizable"""
-    image = process_image(image, only_convolutional, options)
-    rotations = get_rotations(image, options)
+    rotations = None
+    if options.rotate_first:
+        rotations = get_rotations(image, options)
+        rotations = process_images(rotations, only_convolutional, options)
+    else:
+        image = process_image(image, only_convolutional, options)
+        rotations = get_rotations(image, options)
 
     if options.debug:
         for index, rotation in enumerate(rotations):
