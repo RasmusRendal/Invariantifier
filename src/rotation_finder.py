@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
 
-from src.image_processor import process_image
+from src.image_processor import process_image, process_images
 from src.utils import combine_save_patches, rotate_images
 
 
@@ -35,8 +35,13 @@ def get_proper_rotation(only_convolutional,
                         imgindx,
                         options):
     """Get the rotation to apply to a network to make it recognizable"""
-    image = process_image(image, only_convolutional, options)
-    rotations = get_rotations(image, options)
+    rotations = None
+    if options.rotate_first:
+        rotations = get_rotations(image, options)
+        rotations = process_images(rotations, only_convolutional, options)
+    else:
+        image = process_image(image, only_convolutional, options)
+        rotations = get_rotations(image, options)
 
     if options.debug:
         for index, rotation in enumerate(rotations):
@@ -96,6 +101,8 @@ def get_best_rotation(training_samples, rotations, options):
     between m and n. It will then find the index i,j with the lowest error,
     returning j (The rotation)
     """
+    if rotations.shape[1:] != training_samples.shape[1:]:
+        raise ValueError("Incompatible shapes: {0} and {1}".format(rotations.shape, training_samples.shape))
 
     # Expand the dimensions of the vectors to be (1, n) + i
     # and (n, 1) + 1. This makes the arrays compatible using

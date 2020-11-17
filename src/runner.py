@@ -1,6 +1,6 @@
 from tqdm.auto import tqdm
 
-import numpy as np
+import tensorflow as tf
 from src.rotation_finder import get_proper_rotation
 from src.utils import rotate_image, combine_save_patches, random_rotation_angle
 
@@ -36,9 +36,9 @@ def check_some(only_convolutional, x_test, y_test, model, examples, options):
               str(back_rotation_total / options.samples))
 
     y_to_test = y_test[:options.samples]
-    to_test = np.array(to_test, 'float32')
+    to_test = tf.cast(to_test, tf.float32)
     verbose = 2
     if options.serial:
         verbose = 0
-    return model.evaluate(np.expand_dims(to_test, -1),
+    return model.evaluate(tf.expand_dims(to_test, -1),
                           y_to_test, verbose=verbose)

@@ -7,17 +7,20 @@ from src.utils import enlarge_images
 
 
 def split_network(model, num_layers):
-    """Returns the the network up to the specified layer"""
+    """Returns the the network up to and from the specified layer"""
     if num_layers == 0:
-        return None
-    for layer in model.layers:
-        if isinstance(layer, tf.keras.layers.Conv2D):
-            num_layers -= 1
-            if num_layers == 0:
-                return tf.keras.Model(
-                    inputs=model.inputs, outputs=layer.output)
-    raise ValueError("There are not that many layers")
+        return None, model
+    part1 = tf.keras.models.Sequential(model.layers[:num_layers])
+    part2 = tf.keras.models.Sequential(model.layers[num_layers:])
 
+    part1.compile(optimizer='adam')
+    part2.compile(optimizer='adam')
+    part1.build(input_shape=model.input_shape)
+    part2.build(input_shape=part2.layers[0].input_shape)
+    weights = model.get_weights()
+    part1.set_weights(weights[:len(part1.get_weights())])
+    part2.set_weights(weights[len(part1.get_weights()):])
+    return part1, part2
 
 def get_dataset(options):
     """Gets the MNIST dataset, and enlarge the images if options.enlarge is set to true"""
