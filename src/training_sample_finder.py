@@ -36,16 +36,18 @@ def get_representative_patches(x_train, examples, options):
     return currentset
 
 
-def get_random_training_samples(x_train, options):
-    indexes = [randint(0, len(x_train) - 1) for i in range(options.examples)]
+def get_random_training_samples(x_train, examples, options): # pylint: disable=unused-argument
+    indexes = [randint(0, len(x_train) - 1) for i in range(examples)]
     # Hack for indexing with an array
     if isinstance(x_train, np.ndarray):
         return x_train[indexes]
     return x_train.numpy()[indexes]
 
 
-def get_seperated_representatives(x_train, y_train, options):
-    """Get seperate sets of representative patches from 0-9, and combine them"""
+def get_seperated_representatives(function, x_train, y_train, options):
+    """This function runs `function` ten times, once for each digit.
+    It then combines the output of `function` for each digit, giving
+    an even distribution amongst classes in the representative set"""
     training_samples = []
     # Hack for indexing with an array
     if not isinstance(x_train, np.ndarray):
@@ -53,7 +55,7 @@ def get_seperated_representatives(x_train, y_train, options):
     for i in range(10):
         idx = tf.squeeze(tf.where(y_train == i))
         training_samples.append(
-            get_representative_patches(
+            function(
                 x_train[idx], int(
                     options.examples / 10), options))
     return tf.concat(training_samples, 0)
@@ -63,9 +65,9 @@ def get_training_samples(only_convolutional, x_train, y_train, options):
     training_samples = None
     if options.representatives:
         training_samples = get_seperated_representatives(
-            x_train, y_train, options)
+            get_representative_patches, x_train, y_train, options)
     else:
-        training_samples = get_random_training_samples(x_train, options)
+        training_samples = get_seperated_representatives(get_random_training_samples, x_train, y_train, options)
     if len(training_samples.shape) != 3:
         raise ValueError(
             "Invalid shape returned by patch finder: " + str(training_samples.shape))
