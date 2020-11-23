@@ -54,7 +54,7 @@ def eval_model(model, to_test, y_to_test, verbose):
     to_compare = model.predict(to_test, verbose=verbose)
     to_compare = tf.math.argmax(to_compare, 1).numpy()
 
-    for i in range(len(to_compare)):
+    for i, _ in enumerate(to_compare):
         j = to_compare[i]
         k = y_to_test[i]
         if j == k:
