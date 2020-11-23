@@ -45,8 +45,8 @@ def run_experiment(iterations,
 
             if options.accperclass:
                 f.write(str(i) + "," + str(time) + "," + str(res[10]))
-                for i in range(len(res) - 1):
-                    f.write("," + str(res[i]))
+                for j in range(len(res) - 1):
+                    f.write("," + str(res[j]))
                 f.write("\n")
             else:
                 f.write(str(i) + "," + str(time) + "," + str(res[1]) + "\n")

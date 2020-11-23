@@ -42,15 +42,15 @@ def check_some(only_convolutional, x_test, y_test, model, examples, options):
         verbose = 0
     print(y_to_test)
     if options.accperclass:
-        return eval(model, tf.expand_dims(to_test, -1), y_to_test, verbose)
+        return eval_model(model, tf.expand_dims(to_test, -1), y_to_test, verbose)
     else:
         return model.evaluate(tf.expand_dims(to_test, -1),
                               y_to_test, verbose=verbose)
 
-def eval(model, to_test, y_to_test, verbose):
+def eval_model(model, to_test, y_to_test, verbose):
     res = [0]*11
-    tempPerClass = [0]*10
-    tempTotal = 0
+    temp_per_class = [0]*10
+    temp_total = 0
     to_compare = model.predict(to_test, verbose=verbose)
     to_compare = tf.math.argmax(to_compare, 1).numpy()
 
@@ -58,14 +58,14 @@ def eval(model, to_test, y_to_test, verbose):
         j = to_compare[i]
         k = y_to_test[i]
         if j == k:
-            tempTotal = tempTotal + 1
+            temp_total = temp_total + 1
             res[j] = res[j] + 1
-        tempPerClass[k] = tempPerClass[k] + 1
+        temp_per_class[k] = temp_per_class[k] + 1
 
     for i in range(10):
-        res[i] = res[i] / tempPerClass[i]
+        res[i] = res[i] / temp_per_class[i]
 
-    res[10] = tempTotal / len(to_compare)
+    res[10] = temp_total / len(to_compare)
 
     print(res)
 
