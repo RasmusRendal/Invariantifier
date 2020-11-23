@@ -43,8 +43,8 @@ def check_some(only_convolutional, x_test, y_test, model, examples, options):
     print(y_to_test)
     if options.accperclass:
         return eval_model(model, tf.expand_dims(to_test, -1), y_to_test, verbose)
-    else:
-        return model.evaluate(tf.expand_dims(to_test, -1),
+
+    return model.evaluate(tf.expand_dims(to_test, -1),
                               y_to_test, verbose=verbose)
 
 def eval_model(model, to_test, y_to_test, verbose):
