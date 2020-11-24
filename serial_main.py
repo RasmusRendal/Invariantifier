@@ -25,7 +25,10 @@ def run_experiment(iterations,
                    only_convolutional,
                    filename):
     with open(filename, 'w') as f:
-        f.write("examples,time,accuracy\n")
+        if options.accperclass:
+            f.write("examples,time,accuracy,0,1,2,3,4,5,6,7,8,9\n")
+        else:
+            f.write("examples,time,accuracy\n")
         for i in tqdm(range(10, iterations, 20), desc=filename):
             options.examples = i
             start_time = perf_counter()
@@ -40,7 +43,13 @@ def run_experiment(iterations,
                 options)
             time = perf_counter() - start_time
 
-            f.write(str(i) + "," + str(time) + "," + str(res[1]) + "\n")
+            if options.accperclass:
+                f.write(str(i) + "," + str(time) + "," + str(res[10]))
+                for j in range(len(res) - 1):
+                    f.write("," + str(res[j]))
+                f.write("\n")
+            else:
+                f.write(str(i) + "," + str(time) + "," + str(res[1]) + "\n")
             f.flush()
 
 
@@ -105,6 +114,7 @@ def setup():
     if args.basic:
         options = Options()
         options.serial = True
+        options.accperclass = True
         options.convlayers = 0
         options.step = 20
         options.combine = True
@@ -119,6 +129,7 @@ def setup():
     if args.rep:
         options = Options()
         options.serial = True
+        options.accperclass = True
         options.convlayers = 0
         options.step = 20
         options.combine = True
@@ -134,6 +145,7 @@ def setup():
     if args.conv:
         options = Options()
         options.serial = True
+        options.accperclass = True
         options.convlayers = 8
         options.step = 20
         options.combine = False

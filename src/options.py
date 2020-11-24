@@ -22,6 +22,7 @@ class Options: # pylint: disable=too-many-instance-attributes
         self.cache = Cache(self.cache_dir)
         self.convlayers = 0
         self.serial = False
+        self.accperclass = False
         self.representatives = False
         self.samples = 100
         self.rotate_first = False
