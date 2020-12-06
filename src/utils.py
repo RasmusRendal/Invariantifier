@@ -2,7 +2,6 @@
 import os
 import math
 from random import randint
-from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -40,35 +39,9 @@ def random_rotation_angle(step):
     return int(randint(0, int(360 / step)) * step)
 
 
-def rotate_image(image, angle):
-    """perform a rotation on a numpy image array"""
-    if not isinstance(image, np.ndarray):
-        image = image.numpy()
-    img = Image.fromarray(image)
-    img = img.rotate(angle)
-    return np.array(img)
-
-
-def rotate_images(images, angle):
-    """calls rotate_image() for each image in the input"""
-    new_array = []
-    for image in images:
-        new_array.append(rotate_image(image, angle))
-    return np.array(new_array)
-
-
-def random_rotate_image(image, step):
-    """rotate image randomly"""
-    return rotate_image(image, random_rotation_angle(step))
-
-
 def random_rotate_images(images, step):
-    """rotates each image somewhere between 0 and 360 degrees, with step"""
-    to_look = images
-    rotations = [math.radians(randint(0, 360 / step) * step)
-                 for i in range(len(to_look))]
-    return tfa.image.rotate(images, rotations)
-
+    rotations = [random_rotation_angle(step) for i in range(len(images))]
+    return tfa.image.rotate(images, step)
 
 def combine_patches(patches):
     """Combine patches to a single image"""

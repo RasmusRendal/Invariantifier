@@ -48,6 +48,6 @@ def train_and_test(model, options):
     first_eval = model.evaluate(x_test, y_test, verbose=2)
     if first_eval[1] < 0.9:
         raise ValueError("Network too ineffecient (" + str(first_eval[1]) + ")")
-    random_rotate_images(x_test, options.step)
-    second_eval = model.evaluate(x_test, y_test, verbose=2)
+    random_rotations = random_rotate_images(x_test, options.step)
+    second_eval = model.evaluate(random_rotations, y_test, verbose=2)
     return (first_eval, second_eval)

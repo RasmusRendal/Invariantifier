@@ -2,7 +2,7 @@ from tqdm.auto import tqdm
 
 import tensorflow as tf
 from src.rotation_finder import get_proper_rotation
-from src.utils import rotate_image, combine_save_patches, random_rotation_angle
+from src.utils import combine_save_patches, random_rotation_angle
 import tensorflow_addons as tfa
 import math
 
