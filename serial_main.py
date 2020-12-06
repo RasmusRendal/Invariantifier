@@ -12,7 +12,17 @@ from tqdm.auto import tqdm
 from src.training_sample_finder import get_training_samples
 from src.runner import check_some
 from src.options import Options
-from src.network import train_network, get_dataset, get_model, split_network
+from src.network import train_network, get_dataset, get_model, split_network, get_last_conv_layer
+
+profiling_dir = 'profiling'
+experiment_dir = 'experiments'
+
+def remove_caches():
+    try:
+        shutil.rmtree('/tmp/P5/')
+    except OSError:
+        pass
+
 
 # pylint: disable=too-many-arguments
 def run_experiment(iterations,
@@ -53,16 +63,115 @@ def run_experiment(iterations,
             f.flush()
 
 
+def basic(iterations, profile):
+    options = Options()
+    options.serial = True
+    options.accperclass = True
+    options.convlayers = 0
+    options.step = 20
+    options.combine = True
+    options.post_init()
+    x_train, y_train, x_test, y_test = get_dataset(options)  # pylint: disable=unused-variable
+    model = train_network(get_model(x_test, options), options)
+    only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
+    cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
+                    model, only_convolutional, experiment_dir + '/basic.csv')"""
+    if profile:
+        cProfile.run(cmd_string, profiling_dir + '/basic')
+    else:
+        exec(cmd_string)
+
+def rep(iterations, profile):
+    options = Options()
+    options.serial = True
+    options.accperclass = True
+    options.convlayers = 0
+    options.step = 20
+    options.combine = True
+    options.representatives = True
+    options.post_init()
+    x_train, y_train, x_test, y_test = get_dataset(options)  # pylint: disable=unused-variable
+    model = train_network(get_model(x_test, options), options)
+    only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
+    cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
+                    model, only_convolutional, experiment_dir + '/representatives.csv')"""
+    if profile:
+        cProfile.run(cmd_string, profiling_dir + '/representatives')
+    else:
+        exec(cmd_string)
+
+
+def conv(iterations, profile):
+    options = Options()
+    options.serial = True
+    options.accperclass = True
+    options.convlayers = 5
+    options.step = 20
+    options.combine = False
+    options.representatives = False
+    options.post_init()
+    x_train, y_train, x_test, y_test = get_dataset(options)  # pylint: disable=unused-variable
+    model = train_network(get_model(x_test, options), options)
+    only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
+    cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
+                    model, only_convolutional, experiment_dir + '/convolution1.csv')"""
+    if profile:
+        cProfile.run(cmd_string, profiling_dir + '/convolution1')
+    else:
+        exec(cmd_string)
+
+def rot_first(iterations, profile):
+    options = Options()
+    options.serial = True
+    options.convlayers = 5
+    options.step = 20
+    options.combine = False
+    options.representatives = False
+    options.rotate_first = True
+    options.post_init()
+    x_train, y_train, x_test, y_test = get_dataset(options)  # pylint: disable=unused-variable
+    model = train_network(get_model(x_test, options), options)
+    only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
+    cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
+                    model, only_convolutional, experiment_dir + '/rotate_first.csv')"""
+    if profile:
+        cProfile.run(cmd_string, profiling_dir + '/rotate_first')
+    else:
+        exec(cmd_string)
+
+def constraint(iterations, profile):
+    delete = False
+    if delete:
+        remove_caches()
+    options = Options()
+    options.serial = True
+    options.convlayers = 3
+    options.step = 20
+    options.combine = False
+    options.representatives = False
+    options.post_init()
+    options.model_step = 20
+    x_train, y_train, x_test, y_test = get_dataset(options)  # pylint: disable=unused-variable
+    model = train_network(get_model(x_test, options), options)
+    print(model.layers)
+    options.convlayers = get_last_conv_layer(model)+1
+    only_convolutional, _ = split_network(model, options.convlayers)
+    print(only_convolutional.layers[-1])
+    print(only_convolutional.layers[-1])
+    print(only_convolutional.layers[-1])
+    cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
+                    model, only_convolutional, experiment_dir + '/constraint.csv')"""
+    if profile:
+        cProfile.run(cmd_string, profiling_dir + '/constraint')
+    else:
+        exec(cmd_string)
+
+
 def setup():
     options = Options()
     options.serial = True
-    x_train, y_train, x_test, y_test = get_dataset(options)  # pylint: disable=unused-variable
 
-    model = train_network(get_model(x_test), options)
-    only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
 
-    profiling_dir = 'profiling'
-    experiment_dir = 'experiments'
 
     parser = argparse.ArgumentParser(description='Run the experiments')
     parser.add_argument(
@@ -91,6 +200,11 @@ def setup():
         action='store_false',
         help='Skip the rotate first experiment')
     parser.add_argument(
+        '--nocon',
+        dest='constraint',
+        action='store_false',
+        help='Skip the constraint experiment')
+    parser.add_argument(
         '--iterations',
         type=int,
         default=501,
@@ -111,71 +225,22 @@ def setup():
         pass
     os.mkdir(profiling_dir)
 
+    remove_caches()
+
     if args.basic:
-        options = Options()
-        options.serial = True
-        options.accperclass = True
-        options.convlayers = 0
-        options.step = 20
-        options.combine = True
-        options.post_init()
-        cmd_string = """run_experiment(args.iterations, options, x_train, y_train, x_test, y_test,
-                        model, only_convolutional, experiment_dir + '/basic.csv')"""
-        if args.profile:
-            cProfile.run(cmd_string, profiling_dir + '/basic')
-        else:
-            exec(cmd_string)
+        basic(args.iterations, args.profile)
 
     if args.rep:
-        options = Options()
-        options.serial = True
-        options.accperclass = True
-        options.convlayers = 0
-        options.step = 20
-        options.combine = True
-        options.representatives = True
-        options.post_init()
-        cmd_string = """run_experiment(args.iterations, options, x_train, y_train, x_test, y_test,
-                        model, only_convolutional, experiment_dir + '/representatives.csv')"""
-        if args.profile:
-            cProfile.run(cmd_string, profiling_dir + '/representatives')
-        else:
-            exec(cmd_string)
+        rep(args.iterations, args.profile)
 
     if args.conv:
-        options = Options()
-        options.serial = True
-        options.accperclass = True
-        options.convlayers = 8
-        options.step = 20
-        options.combine = False
-        options.representatives = False
-        options.post_init()
-        only_convolutional, _ = split_network(model, options.convlayers)
-        cmd_string = """run_experiment(args.iterations, options, x_train, y_train, x_test, y_test,
-                        model, only_convolutional, experiment_dir + '/convolution1.csv')"""
-        if args.profile:
-            cProfile.run(cmd_string, profiling_dir + '/convolution1')
-        else:
-            exec(cmd_string)
+        conv(args.iterations, args.profile)
 
     if args.rot_first:
-        options = Options()
-        options.serial = True
-        options.convlayers = 8
-        options.step = 20
-        options.combine = False
-        options.representatives = False
-        options.rotate_first = True
-        options.post_init()
-        only_convolutional, _ = split_network(model, options.convlayers)
-        cmd_string = """run_experiment(args.iterations, options, x_train, y_train, x_test, y_test,
-                        model, only_convolutional, experiment_dir + '/rotate_first.csv')"""
-        if args.profile:
-            cProfile.run(cmd_string, profiling_dir + '/rotate_first')
-        else:
-            exec(cmd_string)
+        rot_first(args.iterations, args.profile)
 
+    if args.constraint:
+        constraint(args.iterations, args.profile)
 
 
 if __name__ == "__main__":

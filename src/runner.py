@@ -42,7 +42,6 @@ def check_some(only_convolutional, x_test, y_test, model, examples, options):
     verbose = 2
     if options.serial:
         verbose = 0
-    print(y_to_test)
     if options.accperclass:
         return eval_model(model, tf.expand_dims(to_test, -1), y_to_test, verbose)
 
@@ -68,7 +67,5 @@ def eval_model(model, to_test, y_to_test, verbose):
         res[i] = res[i] / temp_per_class[i]
 
     res[10] = temp_total / len(to_compare)
-
-    print(res)
 
     return res

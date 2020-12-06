@@ -3,11 +3,6 @@ import numpy as np
 import tensorflow as tf
 from src.utils import enlarge_images, random_rotate_images
 
-# try:
-#     tf.compat.v1.enable_eager_execution()
-# except:
-#     pass
-
 
 def train_and_test(model, options):
     """train the neural network based on the options given"""
@@ -39,7 +34,7 @@ def train_and_test(model, options):
 
         print("Loaded weights from: " + model_path)
     else:
-        model.fit(x_train, y_train, epochs=5, callbacks=[model_callback])
+        model.fit(x_train, y_train, epochs=15, callbacks=[model_callback])
 
         model.save(model_path)
 

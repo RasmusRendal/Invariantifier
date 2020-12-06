@@ -6,8 +6,7 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 from src.image_processor import process_image, process_images
-from src.utils import combine_save_patches 
-
+from src.utils import combine_save_patches
 
 def np_array_len(array):
     length = 1
@@ -61,10 +60,11 @@ def get_proper_rotation(only_convolutional,
                     str(index2) +
                     " are identical")
 
-    return get_best_rotation(
+
+    return int(get_best_rotation(
         training_samples,
         rotations,
-        options)
+        options))
 
 
 def get_rotations(image, options):
@@ -72,11 +72,8 @@ def get_rotations(image, options):
     rotations = None
     if options.combine:
         rotations_to_try = int(360 / options.step)
-        rotations = tf.tile(tf.expand_dims(tf.expand_dims(
-            image, -1), 0), [rotations_to_try, 1, 1, 1])
-        rotations = tfa.image.rotate(
-            rotations, [i * math.pi / 180 for i in range(0, 360, options.step)])
-        rotations = tf.squeeze(rotations)
+        rotations = tf.tile(tf.expand_dims(image, 0), [rotations_to_try, 1, 1, 1])
+        rotations = tfa.image.rotate( rotations, [i * math.pi / 180 for i in range(0, 360, options.step)])
     else:
         if options.convlayers == 0:
             rotations = [tfa.image.rotate(image, math.radians(i))
@@ -93,6 +90,7 @@ def get_rotations(image, options):
     return tf.cast(rotations, tf.float32)
 
 
+#@tf.function
 def get_best_rotation(training_samples, rotations, options):
     """This function is a bit of a complicated matrix operation.
     Given a tensor training_samples of dimension m * i, and tensor
@@ -122,4 +120,4 @@ def get_best_rotation(training_samples, rotations, options):
 
     # Find the minimum rotation, return it
     amin = tf.argmin(error)
-    return int(amin.numpy()) * options.step
+    return amin * options.step

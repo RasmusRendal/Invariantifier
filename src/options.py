@@ -15,6 +15,7 @@ class Options: # pylint: disable=too-many-instance-attributes
         self.enlarge = False
         self.debug = False
         self.step = 20
+        self.model_step = -1
         self.combine = False
         self.examples = 100
         self.use_sum = False
@@ -46,6 +47,14 @@ class Options: # pylint: disable=too-many-instance-attributes
             nargs='?',
             help='The step in the rotation')
         parser.add_argument(
+            '--mstep',
+            dest='model_step',
+            type=int,
+            default=20,
+            nargs='?',
+            help='The step in the model')
+
+        parser.add_argument(
             '--layers',
             dest='layers',
             type=int,
@@ -65,6 +74,7 @@ class Options: # pylint: disable=too-many-instance-attributes
                             help="Pick representative training set examples")
         args = parser.parse_args()
         self.debug = args.debug
+        self.model_step = args.model_step
         self.step = args.step
         self.combine = args.combine
         self.examples = args.examples

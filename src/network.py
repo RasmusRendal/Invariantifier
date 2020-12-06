@@ -11,28 +11,29 @@ tf.executing_eagerly()
 
 
 class RotationEquivariant(tf.keras.constraints.Constraint):
-    def __init__(self):
-        pass
+    def __init__(self, step):
+        self.step = step
 
     def __call__(self, w):
         """Takes an array w, and returns w, where rot(w, 90) = w)"""
+        if self.step == -1:
+            return w
         out = tf.zeros(w.shape)
-        step = 20
-        for i in range(0, 360, step):
+        for i in range(0, 360, self.step):
             out = out + tfa.image.rotate(w, math.radians(i))
-        out = out / (360/step)
+        out = out / (360/self.step)
         return out
-        #w = w.numpy()
-        #s = w.shape[0]
-        #print(s)
-        #for i in range(0, math.floor(s/2)):
-        #    for j in range(i, s-i):
-        #        cur = w[i][j]
-        #        w[i][s-i-1] = cur
-        #        w[s-i-1][s-i-1] = cur
-        #        w[s-i-1][i] = cur
-        #return tf.cast(w, tf.float32)
 
+
+def get_last_conv_layer(model):
+    """Returns the index of the last conv layer"""
+    last_conv = -1
+    for index, layer in enumerate(model.layers):
+        if isinstance(layer, tf.keras.layers.Conv2D):
+            last_conv = index
+    if last_conv == -1:
+        raise ValueError("No convolution layers found")
+    return last_conv
 
 def split_network(model, num_layers):
     """Returns the the network up to and from the specified layer"""
@@ -63,20 +64,18 @@ def get_dataset(options):
     return (x_train, y_train, x_test, y_test)
 
 
-def get_model(x_test):
+def get_model(x_test, options):
     """initialize convolutional model"""
     # Unless something changes, (40, 40, 1)
     input_shape = x_test[0].shape
 
     model = tf.keras.Sequential([
         tf.keras.Input(shape=input_shape),
-        tf.keras.layers.Conv2D(64, kernel_size=2, activation="relu", kernel_constraint=RotationEquivariant(), input_shape=input_shape),
-        #tf.keras.layers.MaxPooling2D(pool_size=2),
-        tf.keras.layers.Conv2D(64, kernel_size=2, activation="relu", kernel_constraint=RotationEquivariant()),
-        #tf.keras.layers.MaxPooling2D(pool_size=2),
-        tf.keras.layers.Conv2D(64, kernel_size=2, activation="relu", kernel_constraint=RotationEquivariant()),
-        tf.keras.layers.Conv2D(64, kernel_size=2, activation="relu", kernel_constraint=RotationEquivariant()),
-
+        tf.keras.layers.Conv2D(32, kernel_size=5, activation="relu", kernel_constraint=RotationEquivariant(options.model_step), input_shape=input_shape),
+        tf.keras.layers.Dropout(0.4),
+        tf.keras.layers.Conv2D(8, kernel_size=2, kernel_constraint=RotationEquivariant(options.model_step)),
+        tf.keras.layers.Dropout(0.4),
+        tf.keras.layers.Conv2D(4, kernel_size=2, kernel_constraint=RotationEquivariant(options.model_step)),
         tf.keras.layers.Dropout(0.4),
 
         tf.keras.layers.Flatten(),
