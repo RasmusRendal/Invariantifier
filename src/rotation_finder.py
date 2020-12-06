@@ -79,7 +79,7 @@ def get_rotations(image, options):
         rotations = tf.squeeze(rotations)
     else:
         if options.convlayers == 0:
-            rotations = [rotate_images(image.numpy(), i)
+            rotations = [tfa.image.rotate(image, math.radians(i))
                          for i in range(0, 360, options.step)]
         else:
             rotation_angles = [
@@ -90,7 +90,7 @@ def get_rotations(image, options):
                 rotated.append(tfa.image.rotate(image, angle))
             rotations = tf.stack(rotated)
             assert rotations.shape == (len(rotation_angles),) + image.shape
-    return rotations
+    return tf.cast(rotations, tf.float32)
 
 
 def get_best_rotation(training_samples, rotations, options):

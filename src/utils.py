@@ -23,12 +23,8 @@ def enlarge_image(image):
 
 def enlarge_images(images):
     # First we find the "square" part of the tensor
-    start = -1
-    for i in range(len(images.shape) - 1):
-        if images.shape[i] == 1:
-            continue
-        if images.shape[i] == images.shape[i + 1]:
-            start = i
+    start = len(images.shape) -3
+    assert images.shape[start] == images.shape[start+1]
     new_length = math.ceil(math.sqrt(2) * images.shape[start])
     offset = int((new_length - images.shape[start]) / 2)
     padding = tf.constant(

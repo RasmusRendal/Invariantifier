@@ -14,12 +14,12 @@ def train_and_test(model, options):
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     x_train, x_test = x_train / 255.0, x_test / 255.0
     enlarged = ""
+    x_train = tf.expand_dims(x_train, -1)
+    x_test = tf.expand_dims(x_test, -1)
     if options.enlarge:
         enlarged = "_enlarged"
         x_train = enlarge_images(x_train)
         x_test = enlarge_images(x_test)
-    x_train = np.expand_dims(x_train, -1)
-    x_test = np.expand_dims(x_test, -1)
 
     model_path = "/tmp/P5/model" + enlarged + "/P5_NN_Model.ckpt"
     model_dir = os.path.dirname(model_path)
@@ -46,6 +46,8 @@ def train_and_test(model, options):
         print("Saved model to: " + model_path)
 
     first_eval = model.evaluate(x_test, y_test, verbose=2)
+    if first_eval[1] < 0.9:
+        raise ValueError("Network too ineffecient (" + str(first_eval[1]) + ")")
     random_rotate_images(x_test, options.step)
     second_eval = model.evaluate(x_test, y_test, verbose=2)
     return (first_eval, second_eval)

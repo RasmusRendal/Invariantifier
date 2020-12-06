@@ -14,8 +14,6 @@ def process_image(image, only_convolutional, options):
 
 def process_images(images, only_convolutional, options):
     if options.convlayers != 0:
-        if images.shape[-1] != 1:
-            images = tf.expand_dims(images, -1)
         images = only_convolutional.predict(images)
     if options.enlarge:
         images = enlarge_images(images)

@@ -3,6 +3,8 @@ from tqdm.auto import tqdm
 import tensorflow as tf
 from src.rotation_finder import get_proper_rotation
 from src.utils import rotate_image, combine_save_patches, random_rotation_angle
+import tensorflow_addons as tfa
+import math
 
 #pylint: disable=too-many-arguments,too-many-locals
 def check_some(only_convolutional, x_test, y_test, model, examples, options):
@@ -11,13 +13,13 @@ def check_some(only_convolutional, x_test, y_test, model, examples, options):
     back_rotation_total = 0.0
     for i in tqdm(range(options.samples), disable=options.serial):
         rotation = random_rotation_angle(options.step)
-        rotated = rotate_image(x_test[i], rotation)
+        rotated = tfa.image.rotate(x_test[i], math.radians(rotation))
 
         # Original get_proper_rotation:
         proper_rotation = get_proper_rotation(
             only_convolutional, rotated, examples, i, options)
 
-        back_rotated_image = rotate_image(rotated, proper_rotation)
+        back_rotated_image = tfa.image.rotate(rotated, math.radians(proper_rotation))
         rotation_error += (360 - (rotation + proper_rotation)) ** 2
         back_rotation_total += proper_rotation
 
