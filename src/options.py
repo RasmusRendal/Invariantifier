@@ -30,13 +30,13 @@ class Options: # pylint: disable=too-many-instance-attributes
 
     def parse_args(self, xtest_len):
         parser = argparse.ArgumentParser(description='Identify some numbers')
-        parser.add_argument('samples', type=int, default=60000,
+        parser.add_argument('samples', type=int, default=10000,
                             nargs='?', help='How many samples to check')
         parser.add_argument(
             '--examples',
             dest='examples',
             type=int,
-            default=20,
+            default=100,
             nargs='?',
             help='How many training examples to refer to')
         parser.add_argument(
@@ -70,6 +70,12 @@ class Options: # pylint: disable=too-many-instance-attributes
             dest='use_sum',
             action='store_true',
             help="Sum errors for each rotation when finding best rotation")
+        parser.add_argument(
+            '--rotfirst',
+            dest='rotate_first',
+            action='store_true',
+            help="Sum errors for each rotation when finding best rotation")
+
         parser.add_argument('--rep', dest='use_rep', action='store_true',
                             help="Pick representative training set examples")
         args = parser.parse_args()
@@ -79,6 +85,7 @@ class Options: # pylint: disable=too-many-instance-attributes
         self.combine = args.combine
         self.examples = args.examples
         self.convlayers = args.layers
+        self.rotate_first = args.rotate_first
         if args.samples > xtest_len:
             args.samples = xtest_len
             print(

@@ -64,9 +64,10 @@ def get_proper_rotation(only_convolutional,
     return int(get_best_rotation(
         training_samples,
         rotations,
-        options))
+        options.step))
 
 
+@tf.function
 def get_rotations(image, options):
     """Create all the possible rotations of an image, according to the options"""
     rotations = None
@@ -91,7 +92,7 @@ def get_rotations(image, options):
 
 
 #@tf.function
-def get_best_rotation(training_samples, rotations, options):
+def get_best_rotation(training_samples, rotations, step):
     """This function is a bit of a complicated matrix operation.
     Given a tensor training_samples of dimension m * i, and tensor
     rotations n * i, where m and n are scalars, and i are any subsequent
@@ -120,4 +121,4 @@ def get_best_rotation(training_samples, rotations, options):
 
     # Find the minimum rotation, return it
     amin = tf.argmin(error)
-    return amin * options.step
+    return amin * step

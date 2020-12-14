@@ -8,18 +8,13 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 
-def get_new_length(image):
-    """get new length"""
-    new_length = max(image.shape[0], image.shape[1])
-    new_length = math.ceil(math.sqrt(2) * new_length)
-    return new_length
-
-
+@tf.function
 def enlarge_image(image):
     """Enlarge an image, allowing it to be rotated without losing data"""
     return enlarge_images(tf.expand_dims(image, 0))[0]
 
 
+@tf.function
 def enlarge_images(images):
     # First we find the "square" part of the tensor
     start = len(images.shape) -3
@@ -38,11 +33,12 @@ def random_rotation_angle(step):
     """calculate a random rotation"""
     return int(randint(0, int(360 / step)) * step)
 
-
+@tf.function
 def random_rotate_images(images, step):
     rotations = [random_rotation_angle(step) for i in range(len(images))]
     return tfa.image.rotate(images, step)
 
+@tf.function
 def combine_patches(patches):
     """Combine patches to a single image"""
     if not isinstance(patches, np.ndarray):

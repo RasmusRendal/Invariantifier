@@ -66,7 +66,7 @@ def run_experiment(iterations,
 def basic(iterations, profile):
     options = Options()
     options.serial = True
-    options.accperclass = True
+    #options.accperclass = True
     options.convlayers = 0
     options.step = 20
     options.combine = True
@@ -112,6 +112,7 @@ def conv(iterations, profile):
     options.post_init()
     x_train, y_train, x_test, y_test = get_dataset(options)  # pylint: disable=unused-variable
     model = train_network(get_model(x_test, options), options)
+    options.convlayers = get_last_conv_layer(model)+1
     only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
     cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
                     model, only_convolutional, experiment_dir + '/convolution1.csv')"""
@@ -131,6 +132,7 @@ def rot_first(iterations, profile):
     options.post_init()
     x_train, y_train, x_test, y_test = get_dataset(options)  # pylint: disable=unused-variable
     model = train_network(get_model(x_test, options), options)
+    options.convlayers = get_last_conv_layer(model)+1
     only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
     cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
                     model, only_convolutional, experiment_dir + '/rotate_first.csv')"""
@@ -140,7 +142,7 @@ def rot_first(iterations, profile):
         exec(cmd_string)
 
 def constraint(iterations, profile):
-    delete = False
+    delete = True
     if delete:
         remove_caches()
     options = Options()
@@ -153,12 +155,8 @@ def constraint(iterations, profile):
     options.model_step = 20
     x_train, y_train, x_test, y_test = get_dataset(options)  # pylint: disable=unused-variable
     model = train_network(get_model(x_test, options), options)
-    print(model.layers)
     options.convlayers = get_last_conv_layer(model)+1
     only_convolutional, _ = split_network(model, options.convlayers)
-    print(only_convolutional.layers[-1])
-    print(only_convolutional.layers[-1])
-    print(only_convolutional.layers[-1])
     cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
                     model, only_convolutional, experiment_dir + '/constraint.csv')"""
     if profile:

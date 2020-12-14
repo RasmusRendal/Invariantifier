@@ -34,14 +34,14 @@ def train_and_test(model, options):
 
         print("Loaded weights from: " + model_path)
     else:
-        model.fit(x_train, y_train, epochs=15, callbacks=[model_callback])
+        model.fit(x_train, y_train, epochs=35, callbacks=[model_callback])
 
         model.save(model_path)
 
         print("Saved model to: " + model_path)
 
     first_eval = model.evaluate(x_test, y_test, verbose=2)
-    if first_eval[1] < 0.9:
+    if first_eval[1] < 0.7:
         raise ValueError("Network too ineffecient (" + str(first_eval[1]) + ")")
     random_rotations = random_rotate_images(x_test, options.step)
     second_eval = model.evaluate(random_rotations, y_test, verbose=2)

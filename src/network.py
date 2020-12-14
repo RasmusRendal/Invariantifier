@@ -7,8 +7,6 @@ from src.trainer import train_and_test
 from src.utils import enlarge_images
 import math
 
-tf.executing_eagerly()
-
 
 class RotationEquivariant(tf.keras.constraints.Constraint):
     def __init__(self, step):
@@ -71,11 +69,12 @@ def get_model(x_test, options):
 
     model = tf.keras.Sequential([
         tf.keras.Input(shape=input_shape),
-        tf.keras.layers.Conv2D(32, kernel_size=5, activation="relu", kernel_constraint=RotationEquivariant(options.model_step), input_shape=input_shape),
+        tf.keras.layers.Conv2D(32, kernel_size=3, activation="relu", kernel_constraint=RotationEquivariant(options.model_step), input_shape=input_shape),
+        tf.keras.layers.MaxPool2D(pool_size=3),
         tf.keras.layers.Dropout(0.4),
-        tf.keras.layers.Conv2D(8, kernel_size=2, kernel_constraint=RotationEquivariant(options.model_step)),
+        tf.keras.layers.Conv2D(16, kernel_size=3, kernel_constraint=RotationEquivariant(options.model_step)),
         tf.keras.layers.Dropout(0.4),
-        tf.keras.layers.Conv2D(4, kernel_size=2, kernel_constraint=RotationEquivariant(options.model_step)),
+        tf.keras.layers.Conv2D(4, kernel_size=3, kernel_constraint=RotationEquivariant(options.model_step)),
         tf.keras.layers.Dropout(0.4),
 
         tf.keras.layers.Flatten(),
@@ -84,15 +83,8 @@ def get_model(x_test, options):
         tf.keras.layers.Dropout(0.4),
         tf.keras.layers.Dense(10, activation="softmax"),
     ])
+    model.summary()
     return model
-
-
-def image_to_model(image):
-    """convert image to model"""
-    if image.shape[-1] != 1:
-        return np.expand_dims(np.expand_dims(image, 0), -1)
-    else:
-        return image
 
 
 def train_network(model, options):

@@ -16,8 +16,8 @@ def check_some(only_convolutional, x_test, y_test, model, examples, options):
         rotated = tfa.image.rotate(x_test[i], math.radians(rotation))
 
         # Original get_proper_rotation:
-        proper_rotation = get_proper_rotation(
-            only_convolutional, rotated, examples, i, options)
+        proper_rotation = int(get_proper_rotation(
+            only_convolutional, rotated, examples, i, options))
 
         back_rotated_image = tfa.image.rotate(rotated, math.radians(proper_rotation))
         rotation_error += (360 - (rotation + proper_rotation)) ** 2
