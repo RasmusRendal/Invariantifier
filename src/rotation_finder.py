@@ -28,10 +28,10 @@ def cmp_np_arrays(arr1, arr2):
     return True
 
 
+@tf.function
 def get_proper_rotation(only_convolutional,
                         image,
                         training_samples,
-                        imgindx,
                         options):
     """Get the rotation to apply to a network to make it recognizable"""
     rotations = None
@@ -42,29 +42,11 @@ def get_proper_rotation(only_convolutional,
         image = process_image(image, only_convolutional, options)
         rotations = get_rotations(image, options)
 
-    if options.debug:
-        for index, rotation in enumerate(rotations):
-            combine_save_patches(
-                rotation,
-                imgindx,
-                'ConvRots_img_' +
-                str(index))
-        for (index1, rotation1), (index2, rotation2) in zip(
-                enumerate(rotations), enumerate(rotations)):
-            same = cmp_np_arrays(rotation1, rotation2)
-            if same:
-                print(
-                    "Index " +
-                    str(index1) +
-                    " and index " +
-                    str(index2) +
-                    " are identical")
-
-
-    return int(get_best_rotation(
+    rotation_deg = get_best_rotation(
         training_samples,
         rotations,
-        options.step))
+        options.step)
+    return tf.math.multiply(tf.cast(rotation_deg, tf.float32), math.pi/180)
 
 
 @tf.function

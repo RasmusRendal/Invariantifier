@@ -70,11 +70,10 @@ def get_model(x_test, options):
     model = tf.keras.Sequential([
         tf.keras.Input(shape=input_shape),
         tf.keras.layers.Conv2D(32, kernel_size=3, activation="relu", kernel_constraint=RotationEquivariant(options.model_step), input_shape=input_shape),
-        tf.keras.layers.MaxPool2D(pool_size=3),
         tf.keras.layers.Dropout(0.4),
         tf.keras.layers.Conv2D(16, kernel_size=3, kernel_constraint=RotationEquivariant(options.model_step)),
         tf.keras.layers.Dropout(0.4),
-        tf.keras.layers.Conv2D(4, kernel_size=3, kernel_constraint=RotationEquivariant(options.model_step)),
+        tf.keras.layers.Conv2D(4, kernel_size=3, strides=2, kernel_constraint=RotationEquivariant(options.model_step)),
         tf.keras.layers.Dropout(0.4),
 
         tf.keras.layers.Flatten(),

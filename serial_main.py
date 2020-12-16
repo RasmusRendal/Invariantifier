@@ -39,7 +39,7 @@ def run_experiment(iterations,
             f.write("examples,time,accuracy,0,1,2,3,4,5,6,7,8,9\n")
         else:
             f.write("examples,time,accuracy\n")
-        for i in tqdm(range(10, iterations, 20), desc=filename):
+        for i in tqdm(range(10, iterations), desc=filename):
             options.examples = i
             start_time = perf_counter()
             training_samples = get_training_samples(
