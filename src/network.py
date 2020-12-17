@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """module for various NN-related models and utilities"""
+import math
 import tensorflow as tf
 import tensorflow_addons as tfa
-import numpy as np
 from src.trainer import train_and_test
 from src.utils import enlarge_images
-import math
 
 
 class RotationEquivariant(tf.keras.constraints.Constraint):
+    """Take an np array and make it rotation equivariant"""
     def __init__(self, step):
         self.step = step
 
@@ -69,11 +69,15 @@ def get_model(x_test, options):
 
     model = tf.keras.Sequential([
         tf.keras.Input(shape=input_shape),
-        tf.keras.layers.Conv2D(32, kernel_size=3, activation="relu", kernel_constraint=RotationEquivariant(options.model_step), input_shape=input_shape),
+        tf.keras.layers.Conv2D(32, kernel_size=3, activation="relu",
+                               kernel_constraint=RotationEquivariant(options.model_step),
+                               input_shape=input_shape),
         tf.keras.layers.Dropout(0.4),
-        tf.keras.layers.Conv2D(16, kernel_size=3, kernel_constraint=RotationEquivariant(options.model_step)),
+        tf.keras.layers.Conv2D(16, kernel_size=3,
+                               kernel_constraint=RotationEquivariant(options.model_step)),
         tf.keras.layers.Dropout(0.4),
-        tf.keras.layers.Conv2D(4, kernel_size=3, strides=2, kernel_constraint=RotationEquivariant(options.model_step)),
+        tf.keras.layers.Conv2D(4, kernel_size=3, strides=2,
+                               kernel_constraint=RotationEquivariant(options.model_step)),
         tf.keras.layers.Dropout(0.4),
 
         tf.keras.layers.Flatten(),

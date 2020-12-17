@@ -1,10 +1,11 @@
-from tqdm.auto import tqdm
+import math
 
 import tensorflow as tf
-from src.rotation_finder import get_proper_rotation
-from src.utils import combine_save_patches, random_rotation_angle
 import tensorflow_addons as tfa
-import math
+from tqdm.auto import tqdm
+
+from src.rotation_finder import get_proper_rotation
+from src.utils import random_rotation_angle, combine_save_patches
 
 #pylint: disable=too-many-arguments,too-many-locals
 def check_some(only_convolutional, x_test, y_test, model, examples, options):

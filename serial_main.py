@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#pylint: disable=unused-argument,unused-variable
 
 import argparse
 import cProfile
@@ -14,8 +15,8 @@ from src.runner import check_some
 from src.options import Options
 from src.network import train_network, get_dataset, get_model, split_network, get_last_conv_layer
 
-profiling_dir = 'profiling'
-experiment_dir = 'experiments'
+PROFILING_DIR = 'profiling'
+EXPERIMENT_DIR = 'experiments'
 
 def remove_caches():
     try:
@@ -75,9 +76,9 @@ def basic(iterations, profile):
     model = train_network(get_model(x_test, options), options)
     only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
     cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
-                    model, only_convolutional, experiment_dir + '/basic.csv')"""
+                    model, only_convolutional, EXPERIMENT_DIR + '/basic.csv')"""
     if profile:
-        cProfile.run(cmd_string, profiling_dir + '/basic')
+        cProfile.run(cmd_string, PROFILING_DIR + '/basic')
     else:
         exec(cmd_string)
 
@@ -94,9 +95,9 @@ def rep(iterations, profile):
     model = train_network(get_model(x_test, options), options)
     only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
     cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
-                    model, only_convolutional, experiment_dir + '/representatives.csv')"""
+                    model, only_convolutional, EXPERIMENT_DIR + '/representatives.csv')"""
     if profile:
-        cProfile.run(cmd_string, profiling_dir + '/representatives')
+        cProfile.run(cmd_string, PROFILING_DIR + '/representatives')
     else:
         exec(cmd_string)
 
@@ -115,9 +116,9 @@ def conv(iterations, profile):
     options.convlayers = get_last_conv_layer(model)+1
     only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
     cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
-                    model, only_convolutional, experiment_dir + '/convolution1.csv')"""
+                    model, only_convolutional, EXPERIMENT_DIR + '/convolution1.csv')"""
     if profile:
-        cProfile.run(cmd_string, profiling_dir + '/convolution1')
+        cProfile.run(cmd_string, PROFILING_DIR + '/convolution1')
     else:
         exec(cmd_string)
 
@@ -135,9 +136,9 @@ def rot_first(iterations, profile):
     options.convlayers = get_last_conv_layer(model)+1
     only_convolutional, _ = split_network(model, options.convlayers)  # pylint: disable=unused-variable
     cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
-                    model, only_convolutional, experiment_dir + '/rotate_first.csv')"""
+                    model, only_convolutional, EXPERIMENT_DIR + '/rotate_first.csv')"""
     if profile:
-        cProfile.run(cmd_string, profiling_dir + '/rotate_first')
+        cProfile.run(cmd_string, PROFILING_DIR + '/rotate_first')
     else:
         exec(cmd_string)
 
@@ -158,9 +159,9 @@ def constraint(iterations, profile):
     options.convlayers = get_last_conv_layer(model)+1
     only_convolutional, _ = split_network(model, options.convlayers)
     cmd_string = """run_experiment(iterations, options, x_train, y_train, x_test, y_test,
-                    model, only_convolutional, experiment_dir + '/constraint.csv')"""
+                    model, only_convolutional, EXPERIMENT_DIR + '/constraint.csv')"""
     if profile:
-        cProfile.run(cmd_string, profiling_dir + '/constraint')
+        cProfile.run(cmd_string, PROFILING_DIR + '/constraint')
     else:
         exec(cmd_string)
 
@@ -212,16 +213,16 @@ def setup():
     args = parser.parse_args()
 
     try:
-        shutil.rmtree(experiment_dir)
+        shutil.rmtree(EXPERIMENT_DIR)
     except OSError:
         pass
-    os.mkdir(experiment_dir)
+    os.mkdir(EXPERIMENT_DIR)
 
     try:
-        shutil.rmtree(profiling_dir)
+        shutil.rmtree(PROFILING_DIR)
     except OSError:
         pass
-    os.mkdir(profiling_dir)
+    os.mkdir(PROFILING_DIR)
 
     remove_caches()
 

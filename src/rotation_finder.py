@@ -6,7 +6,6 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 from src.image_processor import process_image, process_images
-from src.utils import combine_save_patches
 
 def np_array_len(array):
     length = 1

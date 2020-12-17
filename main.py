@@ -22,7 +22,7 @@ if __name__ == "__main__":
     model = train_network(get_model(x_test, options), options)
     only_convolutional, _ = split_network(model, options.convlayers)
     model.summary()
-    if only_convolutional != None:
+    if only_convolutional is not None:
         only_convolutional.summary()
     training_samples = get_training_samples(
         only_convolutional, x_train, y_train, options)

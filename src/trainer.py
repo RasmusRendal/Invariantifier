@@ -1,5 +1,4 @@
 import os.path
-import numpy as np
 import tensorflow as tf
 from src.utils import enlarge_images, random_rotate_images
 
