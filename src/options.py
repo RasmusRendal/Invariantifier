@@ -15,6 +15,7 @@ class Options: # pylint: disable=too-many-instance-attributes
         self.enlarge = False
         self.debug = False
         self.step = 20
+        self.model_step = -1
         self.combine = False
         self.examples = 100
         self.use_sum = False
@@ -29,13 +30,13 @@ class Options: # pylint: disable=too-many-instance-attributes
 
     def parse_args(self, xtest_len):
         parser = argparse.ArgumentParser(description='Identify some numbers')
-        parser.add_argument('samples', type=int, default=60000,
+        parser.add_argument('samples', type=int, default=10000,
                             nargs='?', help='How many samples to check')
         parser.add_argument(
             '--examples',
             dest='examples',
             type=int,
-            default=20,
+            default=100,
             nargs='?',
             help='How many training examples to refer to')
         parser.add_argument(
@@ -45,6 +46,14 @@ class Options: # pylint: disable=too-many-instance-attributes
             default=20,
             nargs='?',
             help='The step in the rotation')
+        parser.add_argument(
+            '--mstep',
+            dest='model_step',
+            type=int,
+            default=-1,
+            nargs='?',
+            help='The step in the model')
+
         parser.add_argument(
             '--layers',
             dest='layers',
@@ -61,14 +70,22 @@ class Options: # pylint: disable=too-many-instance-attributes
             dest='use_sum',
             action='store_true',
             help="Sum errors for each rotation when finding best rotation")
+        parser.add_argument(
+            '--rotfirst',
+            dest='rotate_first',
+            action='store_true',
+            help="Sum errors for each rotation when finding best rotation")
+
         parser.add_argument('--rep', dest='use_rep', action='store_true',
                             help="Pick representative training set examples")
         args = parser.parse_args()
         self.debug = args.debug
+        self.model_step = args.model_step
         self.step = args.step
         self.combine = args.combine
         self.examples = args.examples
         self.convlayers = args.layers
+        self.rotate_first = args.rotate_first
         if args.samples > xtest_len:
             args.samples = xtest_len
             print(

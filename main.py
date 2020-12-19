@@ -19,8 +19,11 @@ if __name__ == "__main__":
     x_train, y_train, x_test, y_test = get_dataset(options)
     # Gets the model and the conv part of model, the function also trains the
     # network, if there doesn't exist a saved network
-    model = train_network(get_model(x_test), options)
+    model = train_network(get_model(x_test, options), options)
     only_convolutional, _ = split_network(model, options.convlayers)
+    model.summary()
+    if only_convolutional is not None:
+        only_convolutional.summary()
     training_samples = get_training_samples(
         only_convolutional, x_train, y_train, options)
 

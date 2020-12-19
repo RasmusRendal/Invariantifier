@@ -1,12 +1,6 @@
 import os.path
-import numpy as np
 import tensorflow as tf
 from src.utils import enlarge_images, random_rotate_images
-
-# try:
-#     tf.compat.v1.enable_eager_execution()
-# except:
-#     pass
 
 
 def train_and_test(model, options):
@@ -14,12 +8,12 @@ def train_and_test(model, options):
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     x_train, x_test = x_train / 255.0, x_test / 255.0
     enlarged = ""
+    x_train = tf.expand_dims(x_train, -1)
+    x_test = tf.expand_dims(x_test, -1)
     if options.enlarge:
         enlarged = "_enlarged"
         x_train = enlarge_images(x_train)
         x_test = enlarge_images(x_test)
-    x_train = np.expand_dims(x_train, -1)
-    x_test = np.expand_dims(x_test, -1)
 
     model_path = "/tmp/P5/model" + enlarged + "/P5_NN_Model.ckpt"
     model_dir = os.path.dirname(model_path)
@@ -39,13 +33,15 @@ def train_and_test(model, options):
 
         print("Loaded weights from: " + model_path)
     else:
-        model.fit(x_train, y_train, epochs=5, callbacks=[model_callback])
+        model.fit(x_train, y_train, epochs=35, callbacks=[model_callback])
 
         model.save(model_path)
 
         print("Saved model to: " + model_path)
 
     first_eval = model.evaluate(x_test, y_test, verbose=2)
-    random_rotate_images(x_test, options.step)
-    second_eval = model.evaluate(x_test, y_test, verbose=2)
+    if first_eval[1] < 0.7:
+        raise ValueError("Network too ineffecient (" + str(first_eval[1]) + ")")
+    random_rotations = random_rotate_images(x_test, options.step)
+    second_eval = model.evaluate(random_rotations, y_test, verbose=2)
     return (first_eval, second_eval)

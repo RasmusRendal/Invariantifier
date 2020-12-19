@@ -6,8 +6,6 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 from src.image_processor import process_image, process_images
-from src.utils import combine_save_patches, rotate_images
-
 
 def np_array_len(array):
     length = 1
@@ -29,10 +27,10 @@ def cmp_np_arrays(arr1, arr2):
     return True
 
 
+@tf.function
 def get_proper_rotation(only_convolutional,
                         image,
                         training_samples,
-                        imgindx,
                         options):
     """Get the rotation to apply to a network to make it recognizable"""
     rotations = None
@@ -43,43 +41,24 @@ def get_proper_rotation(only_convolutional,
         image = process_image(image, only_convolutional, options)
         rotations = get_rotations(image, options)
 
-    if options.debug:
-        for index, rotation in enumerate(rotations):
-            combine_save_patches(
-                rotation,
-                imgindx,
-                'ConvRots_img_' +
-                str(index))
-        for (index1, rotation1), (index2, rotation2) in zip(
-                enumerate(rotations), enumerate(rotations)):
-            same = cmp_np_arrays(rotation1, rotation2)
-            if same:
-                print(
-                    "Index " +
-                    str(index1) +
-                    " and index " +
-                    str(index2) +
-                    " are identical")
-
-    return get_best_rotation(
+    rotation_deg = get_best_rotation(
         training_samples,
         rotations,
-        options)
+        options.step)
+    return rotation_deg
 
 
+@tf.function
 def get_rotations(image, options):
     """Create all the possible rotations of an image, according to the options"""
     rotations = None
     if options.combine:
         rotations_to_try = int(360 / options.step)
-        rotations = tf.tile(tf.expand_dims(tf.expand_dims(
-            image, -1), 0), [rotations_to_try, 1, 1, 1])
-        rotations = tfa.image.rotate(
-            rotations, [i * math.pi / 180 for i in range(0, 360, options.step)])
-        rotations = tf.squeeze(rotations)
+        rotations = tf.tile(tf.expand_dims(image, 0), [rotations_to_try, 1, 1, 1])
+        rotations = tfa.image.rotate( rotations, [i * math.pi / 180 for i in range(0, 360, options.step)])
     else:
         if options.convlayers == 0:
-            rotations = [rotate_images(image.numpy(), i)
+            rotations = [tfa.image.rotate(image, math.radians(i))
                          for i in range(0, 360, options.step)]
         else:
             rotation_angles = [
@@ -90,10 +69,11 @@ def get_rotations(image, options):
                 rotated.append(tfa.image.rotate(image, angle))
             rotations = tf.stack(rotated)
             assert rotations.shape == (len(rotation_angles),) + image.shape
-    return rotations
+    return tf.cast(rotations, tf.float32)
 
 
-def get_best_rotation(training_samples, rotations, options):
+#@tf.function
+def get_best_rotation(training_samples, rotations, step):
     """This function is a bit of a complicated matrix operation.
     Given a tensor training_samples of dimension m * i, and tensor
     rotations n * i, where m and n are scalars, and i are any subsequent
@@ -122,4 +102,4 @@ def get_best_rotation(training_samples, rotations, options):
 
     # Find the minimum rotation, return it
     amin = tf.argmin(error)
-    return int(amin.numpy()) * options.step
+    return amin * step

@@ -68,7 +68,7 @@ def get_training_samples(only_convolutional, x_train, y_train, options):
             get_representative_patches, x_train, y_train, options)
     else:
         training_samples = get_seperated_representatives(get_random_training_samples, x_train, y_train, options)
-    if len(training_samples.shape) != 3:
+    if len(training_samples.shape) != 4:
         raise ValueError(
             "Invalid shape returned by patch finder: " + str(training_samples.shape))
 
