@@ -45,7 +45,7 @@ def get_proper_rotation(only_convolutional,
         training_samples,
         rotations,
         options.step)
-    return tf.math.multiply(tf.cast(rotation_deg, tf.float32), math.pi/180)
+    return rotation_deg
 
 
 @tf.function

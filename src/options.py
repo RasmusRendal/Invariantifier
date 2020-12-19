@@ -50,7 +50,7 @@ class Options: # pylint: disable=too-many-instance-attributes
             '--mstep',
             dest='model_step',
             type=int,
-            default=20,
+            default=-1,
             nargs='?',
             help='The step in the model')
 
