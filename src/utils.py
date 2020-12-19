@@ -36,7 +36,7 @@ def random_rotation_angle(step):
 @tf.function
 def random_rotate_images(images, step):
     rotations = [random_rotation_angle(step) for i in range(len(images))]
-    return tfa.image.rotate(images, step)
+    return tfa.image.rotate(images, rotations)
 
 @tf.function
 def combine_patches(patches):

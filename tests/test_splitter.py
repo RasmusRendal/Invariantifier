@@ -12,9 +12,8 @@ class TestSplitter(unittest.TestCase):
     def test_split(self):
         options = Options()
         _, _, x_test, _ = get_dataset(options)
-        model = train_network(get_model(x_test), options)
+        model = train_network(get_model(x_test, options), options)
         part1, part2 = split_network(model, 3)
-        x_test = tf.expand_dims(x_test, -1)
         model_output = model(x_test[0:5])
         split_output = part2(part1(x_test[0:5]))
 
@@ -28,9 +27,9 @@ class TestSplitter(unittest.TestCase):
         This is not as much a test as a demonstration of fact"""
         options = Options()
         _, _, x_test, _ = get_dataset(options)
-        model = train_network(get_model(x_test), options)
+        model = train_network(get_model(x_test, options), options)
         part1, _ = split_network(model, 8)
-        image = tf.expand_dims(tf.expand_dims(x_test[0], -1), 0)
+        image = tf.expand_dims(x_test[0], 0)
         rotated_image = tfa.image.rotate(image, math.pi)
         out = tfa.image.rotate(part1(image), math.pi)
         rotated_out = part1(rotated_image)
